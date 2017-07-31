@@ -1,0 +1,61 @@
+# Hacking CHEMION LED Glasses
+
+This document describes the [CHEMION Bluetooth LED Glasses](https://www.amazon.co.uk/CHEMION-Bluetooth-Messages-Animation-Drawings/dp/B01B41PHJM) from a hacker's perspective, mostly focusing on Bluetooth packets for interoperability purposes. All information here is as a result of experimentation and reverse engineering.
+
+### Hardware
+
+The glasses have 9 rows of 24 LEDs.
+
+The processor used on the glasses is likely a [Nordic nRF51 series SoC](https://www.nordicsemi.com/Products/nRF51-Series-SoC) which contains a 32-bit ARM Cortex-M0 core. This was identified by the fact that the app supports updating the firmware via Bluetooth, and contains Nordic's DFU library.
+
+The APK file for the app contains four sets of firmware for the device, [Intel HEX](https://en.wikipedia.org/wiki/Intel_HEX) format:
+
+* WaGL_C2_0.1.13_20150403.hex
+* WaGL_nRF_C2_1.0.0_20150406.hex
+* WaGL_nRF_C2_1.0.1_20150904.hex
+* WaGL_nRF_C2_1.0.1_20150915.hex
+
+### Frame format
+
+The code specifies that the LED state array length is 216 elements (9 &times; 24), and that the frame size (for Bluetooth packets) is 54 bytes. By calculating (9 &times; 24) &div; (54 &times; 8) = 2 we can guess that the frame format is 2 bits per pixel. At the moment I am unsure which bits are in use, and what the different states mean. This will be explored further at a later date.
+
+### Command Types
+
+The following command types have been found:
+
+* `REQUEST`(b, 0x01)
+* `REPLY` (c, 0x02)
+* `STREAM` (d, 0x03)
+* `NOTIFY` (e, 0x04)
+* `ERROR` (f, 0x05)
+* `IDENTIFY` (g, 0x06)
+
+The letters shown are used as enumeration identifiers in the Java bytecode. The numbers are the literal values (bytes).
+
+### Message Types
+
+These values are thought to be used with various commands above, or may be replies from various commands/events.
+
+* `STATUS` (0x01)
+* `POWER_OFF` (0x02)
+* `BATTERY_LEVEL` (0x03)
+* `FRAME_DATA_TRANSMISSION_END` (0x04)
+* `FRAME_DATA_TRANSMISSION` (0x05)
+* `GET_DEVICE_IDENTIFIER` (0x06)
+* `FIRMWARE_VERSION` (0x07)
+* `HEARTBEAT` (0x08)
+* `SET_DEVICE_IDENTIFIER` (0x09)
+* `FRAMES_DATA_TRANSMISSION_START` (0x0A)
+* `FRAMES_DATA_TRANSMISSION_END` (0x0B)
+* `FRAMES_DATA_TRANSMISSION` (0x0C)
+* `FRAMES_DATA_RECEIVING_FROM_SLOT_START` (0x0D)
+* `PLAY_FRAMESDATA_ON_SLOT` (0x0E)
+* `DELETE_SLOT_DATA` (0x0F)
+* `FREE_SLOT_SPACE` (0x10)
+* `START_DFU` (0x11)
+* `UNKNOWN_MODULE_ID` (0x12)
+
+
+### Device slots
+
+The glasses have a number of "device slots" to which data can be saved. Data is in the format of an array of frames, each frame describing the LED state.
