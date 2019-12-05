@@ -1,0 +1,285 @@
+CHEMION-83:D5
+C7:46:5B:26:83:D5
+
+== FAIL, No sucess with gatttool with this device ==
+gatttool -b C7:46:5B:26:83:D5 --char-read -a 0x0003|awk -F':' '{print $2}'|tr -d ' '|xxd -r -p;printf '\n'
+
+== Checksum FAIL ==
+- Work in progress
+
+fa03003901000600000000000200000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000055a9
+hex((sum([int(x[2*i:2*(i+1)],16) for i in range(0, len(x)//2)[4:-2]]))&0xFF)
+
+== FAIL, Try again on diffrent platform == 
+sudo gatttool -b C7:46:5B:26:83:D5 --char-write-req -a 0x0011 -n fa030039010006c0000000000000000000000000;
+sudo gatttool -b C7:46:5B:26:83:D5 --char-write-req -a 0x0011 -n 0000000000000000000000000000000000000000;
+sudo gatttool -b C7:46:5B:26:83:D5 --char-write-req -a 0x0011 -n 0000000000000000000000000000000000000000;
+sudo gatttool -b C7:46:5B:26:83:D5 --char-write-req -a 0x0011 -n 00c755a9;
+
+== Enumeration ==
+
+
+@ Scanning for 5s [-128 dBm of sensitivity] ...
+
+┌ c7:46:5b:26:83:d5 (-38 dBm) ───────────────────────────────────────────┐
+│ Vendor                 │ ?                                             │
+│ Allows Connections     │ ✓                                             │
+│ Address Type           │ random                                        │
+│ Complete 128b Services │ '6e400001-b5a3-f393-e0a9-e50e24dcca9e'        │
+│ Complete Local Name    │ CHEMION-83:D5                    │
+│ Flags                  │ LE General Discoverable, BR/EDR Not Supported │
+└────────────────────────┴───────────────────────────────────────────────┘
+
+@ Connecting to c7:46:5b:26:83:d5 ... connected.
+@ Enumerating all the things ...
+
+┌──────────────┬───────────────────────────────────────────────────────────────────────────────────────┬──────────────────────────┬─────────────────────────────────────────────────────────────────────┐
+│ Handles      │ Service > Characteristics                                                             │ Properties               │ Data                                                                │
+├──────────────┼───────────────────────────────────────────────────────────────────────────────────────┼──────────────────────────┼─────────────────────────────────────────────────────────────────────┤
+│ 0001 -> 0007 │ Generic Access ( 00001800-0000-1000-8000-00805f9b34fb )                               │                          │                                                                     │
+│ 0003         │   Device Name ( 00002a00-0000-1000-8000-00805f9b34fb )                                │ READ WRITE               │ 'CHEMION-83:D5\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00' │
+│ 0005         │   Appearance ( 00002a01-0000-1000-8000-00805f9b34fb )                                 │ READ                     │ '4\x12'                                                             │
+│ 0007         │   Peripheral Preferred Connection Parameters ( 00002a04-0000-1000-8000-00805f9b34fb ) │ READ                     │ Connection Interval: 8 -> 40                                        │
+│              │                                                                                       │                          │ Slave Latency: 0                                                    │
+│              │                                                                                       │                          │ Connection Supervision Timeout Multiplier: 400                      │
+│              │                                                                                       │                          │                                                                     │
+│ 0008 -> 000b │ Generic Attribute ( 00001801-0000-1000-8000-00805f9b34fb )                            │                          │                                                                     │
+│ 000a         │   Service Changed ( 00002a05-0000-1000-8000-00805f9b34fb )                            │ INDICATE                 │                                                                     │
+│              │                                                                                       │                          │                                                                     │
+│ 000c -> ffff │ 6e400001-b5a3-f393-e0a9-e50e24dcca9e                                                  │                          │                                                                     │
+│ 000e         │   6e400003-b5a3-f393-e0a9-e50e24dcca9e                                                │ NOTIFY                   │                                                                     │
+│ 0011         │   6e400002-b5a3-f393-e0a9-e50e24dcca9e                                                │ WRITE NO RESPONSE WRITE  │                                                                     │
+│              │                                                                                       │                          │                                                                     │
+└──────────────┴───────────────────────────────────────────────────────────────────────────────────────┴──────────────────────────┴─────────────────────────────────────────────────────────────────────┘
+
+
+
+-Nordic UART Emulated over BLE
+-Each UART message is 20 bytes
+-Every command starts with FA 03 00 39 01
+-Every command ends with 55 A9
+-Every command is 64 Bytes
+-Nordic UART is big endien while the rest of the BLE packet is little endien
+
+24 x 9	
+
+	0 | X X X X X X X X X X X X X X X X X X X X X X X X
+	1 | X X X X X X X X X X X X X X X X X X X X X X X X 
+	2 | X X X X X X X X X X X X X X X X X X X X X X X X 
+	3 | X X X X X X X X X X X X X X X X X X X X X X X X 
+	4 | X X X X X X X X X X X X X X X X X X X X X X X X 
+	5 | X X X X X X X X X X X X X X X X X X X X X X X X 
+	6 | X X X X X X X X X X X X X X X X X X X X X X X X 
+	7 | X X X X X X X X X X X     X X X X X X X X X X X 
+	8 | X X X X X X X X X X         X X X X X X X X X X 
+	  |________________________________________________ 
+ 	    0 1 2 3 4 5 6 7 8 9 A B C D E F G H I J K L M N
+
+
+==0X0 100% ON==
+
+       *START*                				    *LED*			           *SUM?*    *End*
+FA 03 00 39 01 00 06 	0|  C     0     0     0     0     0     0     0     0     0     0     0
+			1|  0     0     0     0     0     0     0     0     0     0     0     0
+			2|  0     0     0     0     0     0     0     0     0     0     0     0
+			3|  0     0     0     0     0     0     0     0     0     0     0     0
+			4|  0     0     0     0     0     0     0     0     0     0     0     0
+			5|  0     0     0     0     0     0     0     0     0     0     0     0
+			6|  0     0     0     0     0     0     0     0     0     0     0     0
+			7|  0     0     0     0     0     0     0     0     0     0     0     0
+			8|  0     0     0     0     0     0     0     0     0     0     0     0      C7      55 a9
+			 |______________________________________________________________________
+ 	    		   0 1   2 3   4 5   6 7   8 9   A B   C D   E F   G H   I J   K L   M N
+
+- Progression for LED for 100% ON is C00000000000 --> 300000000000 --> 0C0000000000
+- This Progression of C's and 3's Starts at 0x8 and ends at 0xN
+- Even numbers along the x axis (0x0, 2x0, 4x0) are the big value
+- Odds are (1x0, 3x0, 5x0) small value on the matrix.
+	
+== 3 LED Settings ==
+- 100% ON is C --> 3
+- 50%  ON is 8 --> 2
+- 25%  ON is 4 --> 1  
+
+- If two LED's need to be on that share the same place holder (ex. 0x0 and 1x0) both values are added
+- 0x0 100%ON + 1x0 100%ON: \xC + \x3 = \xF
+- 0x0 100%ON + 1x0 50%ON:  \xC + \x2 = \xE
+- 0x0 25%ON  + 1x0 25%ON:  \x4 + \x1 = \x5
+
+- Every time there's an update from the phone app the complete matrix is sent to the glassess.
+
+- CREATIONs can be saved on the glassess, 5 slots available
+-== To Save for slot one == 
+Packet1 Value: fa0100030100050455a9
+Packet2 Value: fa010004010014011455a9
+Packet3 Value: fa010004010014011455a9
+
+- LED Matrix
+Packet1 Value: fa01003b01000d010a00000000000000003c3c00
+Packet2 Value: 0000003c3c000000000000000000000003000000
+Packet3 Value: 03c00f00000000c00c000000003ff00000000000
+Packet4 Value: 000000cb55a9
+
+Final Packet Value: fa01000301000c0d55a9
+
+========================================================
+
+==CLEAR==
+Packet1 Value: fa03003901000600000000000000000000000000 (20 Bytes)
+Packet2 Value: 0000000000000000000000000000000000000000 (20 Bytes)
+Packet3 Value: 0000000000000000000000000000000000000000 (20 Bytes)
+Packet4 Value: 000755a9					(4  Bytes)
+
+
+========================================================
+-0x0 to 0x8
+-C gets pushed to the right 12 bytes every pixle going down
+
+==0x0 ON==
+Packet1 Value: fa030039010006c0000000000000000000000000
+Packet2 Value: 0000000000000000000000000000000000000000
+Packet3 Value: 0000000000000000000000000000000000000000
+Packet4 Value: 00c755a9
+
+==0x1 ON==
+Packet1 Value: fa030039010006000000000000c0000000000000
+Packet2 Value: 0000000000000000000000000000000000000000
+Packet3 Value: 0000000000000000000000000000000000000000
+Packet4 Value: 00c755a9
+
+==0x2 ON==
+Packet1 Value: fa030039010006000000000000000000000000c0
+Packet2 Value: 0000000000000000000000000000000000000000
+Packet3 Value: 0000000000000000000000000000000000000000
+Packet4 Value: 00c755a9
+
+==0x3 ON==
+Packet1 Value: fa03003901000600000000000000000000000000
+Packet2 Value: 0000000000c00000000000000000000000000000
+Packet3 Value: 0000000000000000000000000000000000000000
+Packet4 Value: 00c755a9
+
+==0x4 ON==
+Packet1 Value: fa03003901000600000000000000000000000000
+Packet2 Value: 0000000000000000000000c00000000000000000
+Packet3 Value: 0000000000000000000000000000000000000000
+Packet4 Value: 00c755a9
+
+==0x5 ON==
+Packet1 Value: fa03003901000600000000000000000000000000
+Packet2 Value: 0000000000000000000000000000000000c00000
+Packet3 Value: 0000000000000000000000000000000000000000
+Packet4 Value: 00c755a9
+
+==0x6 ON==
+Packet1 Value: fa03003901000600000000000000000000000000
+Packet2 Value: 0000000000000000000000000000000000000000
+Packet3 Value: 000000c000000000000000000000000000000000
+Packet4 Value: 00c755a9
+
+==0x7 ON==
+Packet1 Value: fa03003901000600000000000000000000000000
+Packet2 Value: 0000000000000000000000000000000000000000
+Packet3 Value: 000000000000000000c000000000000000000000
+Packet4 Value: 00c755a9
+
+==0x8 ON==
+Packet1 Value: fa03003901000600000000000000000000000000
+Packet2 Value: 0000000000000000000000000000000000000000
+Packet3 Value: 000000000000000000000000000000c000000000
+Packet4 Value: 00c755a9
+
+========================================================
+
+==0x0 ON==
+Packet1 Value: fa030039010006c0000000000000000000000000
+Packet2 Value: 0000000000000000000000000000000000000000
+Packet3 Value: 0000000000000000000000000000000000000000
+Packet4 Value: 00c755a9
+
+==1x0 ON==
+Packet1 Value: fa03003901000630000000000000000000000000
+Packet2 Value: 0000000000000000000000000000000000000000
+Packet3 Value: 0000000000000000000000000000000000000000
+Packet4 Value: 003755a9
+
+==2x0 ON==
+Packet1 Value: fa0300390100060c000000000000000000000000
+Packet2 Value: 0000000000000000000000000000000000000000
+Packet3 Value: 0000000000000000000000000000000000000000
+Packet4 Value: 000b55a9
+
+==3x0 ON==
+Packet1 Value: fa03003901000603000000000000000000000000
+Packet2 Value: 0000000000000000000000000000000000000000
+Packet3 Value: 0000000000000000000000000000000000000000
+Packet4 Value: 000455a9
+
+
+==4x0 ON==
+Packet1 Value: fa03003901000600c00000000000000000000000
+Packet2 Value: 0000000000000000000000000000000000000000
+Packet3 Value: 0000000000000000000000000000000000000000
+Packet4 Value: 00c755a9
+
+==24x0 ON==
+Packet1 Value: fa03003901000600000000000300000000000000
+Packet2 Value: 0000000000000000000000000000000000000000
+Packet3 Value: 0000000000000000000000000000000000000000
+Packet4 Value: 000455a9
+
+==0x1 ON==
+Packet1 Value: fa030039010006000000000000c0000000000000
+Packet2 Value: 0000000000000000000000000000000000000000
+Packet3 Value: 0000000000000000000000000000000000000000
+Packet4 Value: 00c755a9
+
+==1x1 ON==
+Packet1 Value: fa03003901000600000000000030000000000000
+Packet2 Value: 0000000000000000000000000000000000000000
+Packet3 Value: 0000000000000000000000000000000000000000
+Packet4 Value: 003755a9
+
+
+========================================================
+
+==Nx0 ON==
+Packet1 Value: fa03003901000600000000000300000000000000
+Packet2 Value: 0000000000000000000000000000000000000000
+Packet3 Value: 0000000000000000000000000000000000000000
+Packet4 Value: 000455a9
+
+==Nx0 50%==
+Packet1 Value: fa03003901000600000000000200000000000000
+Packet2 Value: 0000000000000000000000000000000000000000
+Packet3 Value: 0000000000000000000000000000000000000000
+Packet4 Value: 000555a9
+
+==Nx0 25%==
+Packet1 Value: fa03003901000600000000000100000000000000
+Packet2 Value: 0000000000000000000000000000000000000000
+Packet3 Value: 0000000000000000000000000000000000000000
+Packet4 Value: 000655a9
+
+========================================================
+
+==0x0 ON==
+Packet1 Value: fa030039010006c0000000000000000000000000
+Packet2 Value: 0000000000000000000000000000000000000000
+Packet3 Value: 0000000000000000000000000000000000000000
+Packet4 Value: 00c755a9
+
+==0x0 50%==
+Packet1 Value: fa03003901000680000000000000000000000000
+Packet2 Value: 0000000000000000000000000000000000000000
+Packet3 Value: 0000000000000000000000000000000000000000
+Packet4 Value: 008755a9
+
+==0x0 25%==
+Packet1 Value: fa03003901000640000000000000000000000000
+Packet2 Value: 0000000000000000000000000000000000000000
+Packet3 Value: 0000000000000000000000000000000000000000
+Packet4 Value: 004755a9
+
+
+
