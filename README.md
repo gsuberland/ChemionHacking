@@ -6,6 +6,7 @@ Visit [the project wiki](https://github.com/gsuberland/ChemionHacking/wiki) for 
 
 ### TODO
 * Figure out checksum algorithm of UART Message
+* Pull firmware from the glassess
 * Build POC Client application to send commands to the CHEMION Glasses
 * Build POC Server application to receve commands from the CHEMION App
 
