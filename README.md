@@ -1,6 +1,8 @@
 # Hacking CHEMION LED Glasses
 
-![Chemion](/img/main.jpg)
+<p align="center">
+  <img src="/img/main.jpg">
+</p>
 
 This project aims to document the [CHEMION Bluetooth LED Glasses](https://www.amazon.co.uk/CHEMION-Bluetooth-Messages-Animation-Drawings/dp/B01B41PHJM) from a hacker's perspective with the goal to imulate both Server and Client functions of these devices. The resurch mostly focuses on the Bluetooth packets for interoperability purposes. All information here is as a result of experimentation and reverse engineering.
 
