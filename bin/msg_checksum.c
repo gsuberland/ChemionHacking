@@ -2,14 +2,14 @@
 #include <stdlib.h>
 #include <inttypes.h>
 
-uint8_t checksum(uint8_t *in) {
-    uint8_t crc = 0x07;                // CRC Magic Number
+uint8_t checkSum(uint8_t *in) {
+    uint8_t checkSum = 0x07;                // Check Sum Magic Number
 
     int i;
-    for (i = 7; i <= 61; i ++) {       // CRC for 54Byte LED Matrix
-        crc = crc ^ in[i] & 0xff;      // Each Byte is XORed ontop of the last
+    for (i = 7; i <= 61; i ++) {            // Check Sum for 54Byte LED Matrix
+        checkSum = checkSum ^ in[i] & 0xff; // Each Byte is XORed ontop of the last
     }
-    return crc;
+    return checkSum;
 }
 
 
@@ -25,7 +25,7 @@ int main() {
                        0x00, 0X00, 0X00, 0X00, 0X00, 0X00,
                        0x00, 0X00, 0X00, 0X00, 0X00, 0X00};
 
-    msg[62] = checksum(msg);    // Get CRC
+    msg[62] = checkSum(msg);    // Get checkSum
     msg[63] = 0x55;             // Ending Bytes
     msg[64] = 0xa9;             // Ending Bytes
 
