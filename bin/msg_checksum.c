@@ -7,7 +7,7 @@ uint8_t checkSum(uint8_t *in) {
 
     int i;
     for (i = 7; i <= 61; i ++) {            // Check Sum for 54Byte LED Matrix
-        checkSum = checkSum ^ in[i] & 0xff; // Each Byte is XORed ontop of the last
+        checkSum ^= in[i];                  // Each Byte is XORed ontop of the last
     }
     return checkSum;
 }
