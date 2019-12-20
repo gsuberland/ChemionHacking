@@ -5,9 +5,9 @@ This project aims to document the [CHEMION Bluetooth LED Glasses](https://www.am
 Visit [the project wiki](https://github.com/gsuberland/ChemionHacking/wiki) for information.
 
 ### TODO
-* Figure out checksum algorithm of UART Message
+* ~~Figure out checksum algorithm of UART Message~~
 * Pull firmware from the glassess
-* Build POC Client application to send commands to the CHEMION Glasses
+* ~~Build POC Client application to send commands to the CHEMION Glasses~~ Note: Working POC needs improvment.
 * Build POC Server application to receve commands from the CHEMION App
 
 
@@ -15,4 +15,5 @@ Visit [the project wiki](https://github.com/gsuberland/ChemionHacking/wiki) for 
 * Gsuberland
 * Jilles
 * Jurrejelle
+* Tnayuki
 * NotPike
