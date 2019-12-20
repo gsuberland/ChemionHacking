@@ -7,8 +7,9 @@ Visit [the project wiki](https://github.com/notpike/ChemionHacking/wiki) for inf
 ### TODO
 * ~~Figure out checksum algorithm of UART Message~~
 * Pull firmware from the glassess
-* ~~Build POC Client application to send commands to the CHEMION Glasses~~ Note: Working POC needs improvment.
+* ~~Build POC Client application to send commands to the Chemion Glasses~~ \*Note: Working POC needs improvment.
 * Build POC Server application to receve commands from the CHEMION App
+* Build Web App to interface with the Chemion Glassess via a M5Stack (ESP32) 
 
 
 ### Contributors
