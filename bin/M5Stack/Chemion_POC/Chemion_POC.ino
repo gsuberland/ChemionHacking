@@ -57,13 +57,16 @@ static BLEUUID    TX_NUS_UUID("6E400003-B5A3-F393-E0A9-E50E24DCCA9E"); // UART T
 static boolean doConnect = false;
 static boolean connected = false;
 static boolean doScan = false;
-static BLERemoteCharacteristic* pRemoteCharacteristic;
+static BLERemoteCharacteristic* pRemoteCharacteristicRX;
+static BLERemoteCharacteristic* pRemoteCharacteristicTX;
 static BLEAdvertisedDevice* myDevice;
+static BLEClient*  pClient;
 
 
 
 /*==================== L O G I C ==================== */
 
+// Handles Notify from TX NUS
 static void notifyCallback(BLERemoteCharacteristic* pBLERemoteCharacteristic,
                            uint8_t* pData,
                            size_t length,
@@ -84,7 +87,8 @@ class MyClientCallback : public BLEClientCallbacks {
 
   void onDisconnect(BLEClient* pclient) {
     connected = false;
-    Serial.println("onDisconnect");
+    Serial.printf("Detach: %s\n",myDevice->getName().c_str());
+    M5.Lcd.printf(">>> Detach: %s\n",myDevice->getName().c_str());
   }
 };
 
@@ -93,7 +97,8 @@ bool connectToServer() {
     Serial.print("Forming a connection to ");
     Serial.println(myDevice->getAddress().toString().c_str());
     
-    BLEClient*  pClient  = BLEDevice::createClient();
+    //BLEClient*  pClient  = BLEDevice::createClient();
+    pClient  = BLEDevice::createClient();
     Serial.println(" - Created client");
 
     pClient->setClientCallbacks(new MyClientCallback());
@@ -112,30 +117,36 @@ bool connectToServer() {
     }
     Serial.println(" - Found our service");
 
-
-    // Obtain a reference to the characteristic in the service of the remote BLE server.
-    pRemoteCharacteristic = pRemoteService->getCharacteristic(RX_NUS_UUID);
-    if (pRemoteCharacteristic == nullptr) {
+    // NUS RX
+    pRemoteCharacteristicRX = pRemoteService->getCharacteristic(RX_NUS_UUID);
+    if (pRemoteCharacteristicRX == nullptr) {
       Serial.print("Failed to find our characteristic UUID: ");
       Serial.println(RX_NUS_UUID.toString().c_str());
       pClient->disconnect();
       return false;
     }
-    Serial.println(" - Found our characteristic");
-
-    // Read the value of the characteristic.
-    if(pRemoteCharacteristic->canRead()) {
-      std::string value = pRemoteCharacteristic->readValue();
-      Serial.print("The characteristic value was: ");
-      Serial.println(value.c_str());
+    Serial.println(" - Found NUS RX characteristic");
+    
+    // NUS TX
+    pRemoteCharacteristicTX = pRemoteService->getCharacteristic(TX_NUS_UUID);
+    if (pRemoteCharacteristicTX == nullptr) {
+      Serial.print("Failed to find our characteristic UUID: ");
+      Serial.println(TX_NUS_UUID.toString().c_str());
+      pClient->disconnect();
+      return false;
     }
+    Serial.println(" - Found NUS TX characteristic");
 
-    if(pRemoteCharacteristic->canNotify())
-      pRemoteCharacteristic->registerForNotify(notifyCallback);
+    // Notify for NUS TX
+    if(pRemoteCharacteristicTX->canNotify()) {
+      pRemoteCharacteristicTX->registerForNotify(notifyCallback);
+      Serial.println(" - Will notify for call back");
+    }
 
     connected = true;
     return true;
 }
+
 
 //Scan for BLE servers and find the first one that advertises the service we are looking for.
 class MyAdvertisedDeviceCallbacks: public BLEAdvertisedDeviceCallbacks {
@@ -158,6 +169,7 @@ class MyAdvertisedDeviceCallbacks: public BLEAdvertisedDeviceCallbacks {
   } // onResult
 }; // MyAdvertisedDeviceCallbacks
 
+
 void bleInit() {
   BLEDevice::init("");
 
@@ -170,6 +182,7 @@ void bleInit() {
   pBLEScan->setWindow(449);
   pBLEScan->setActiveScan(true);
   pBLEScan->start(5, false);
+  M5.Lcd.printf(">>> Scaning...\n"); 
 }
 
 void screenInit() {
@@ -208,7 +221,7 @@ void screenInit() {
 }
 
 
-/*==================== S E T U P ==================== */
+/*======================== S E T U P ======================== */
 void setup() {
   M5.begin();
   Serial.begin(115200);
@@ -221,23 +234,21 @@ void setup() {
 /*==================== M A I N   L O O P ==================== */
 void loop() {
 
-  // If the flag "doConnect" is true then we have scanned for and found the desired
-  // BLE Server with which we wish to connect.  Now we connect to it.  Once we are 
-  // connected we set the connected flag to be true.
+  // When doConnect flag is true (Fliped by onResult())
+  // Connect to the GATT Server
   if (doConnect == true) {
     if (connectToServer()) {
       Serial.printf("Connected to %s.\n",myDevice->getName().c_str());
       M5.Lcd.printf(">>> Connect: %s\n",myDevice->getName().c_str());
     } else {
-      Serial.println("We have failed to connect to the server; there is nothin more we will do.");
-      M5.Lcd.printf(">>> We have failed to connect to the server; there is nothin more we will do.\n");
+      Serial.println("Failed to connect to server");
+      M5.Lcd.printf(">>> Failed to connect to server\n");
     }
     doConnect = false;
   }
 
-
-  // If we are connected to a peer BLE Server, update the characteristic each time we are reached
-  // with the current time since boot.
+    
+  // Send Message when connected
   if (connected) {
     
     // Static Display "0w0 ?"
@@ -264,24 +275,34 @@ void loop() {
     // Device fails when sent
 //    int i;
 //    for(i = 0; i < 8; i++) {
-//      pRemoteCharacteristic->writeValue(msg_save[i], (sizeof(msg_save[i]) / sizeof(*msg_save[i])) );
+//      pRemoteCharacteristicRX->writeValue(msg_save[i], (sizeof(msg_save[i]) / sizeof(*msg_save[i])) );
+//      delay(100);
 //    }
 
     // Send msg_static
     int i;
     for(i = 0; i < 4; i++) {
-      pRemoteCharacteristic->writeValue(msg_static[i], (sizeof(msg_static[i]) / sizeof(*msg_static[i])) );
+      pRemoteCharacteristicRX->writeValue(msg_static[i], (sizeof(msg_static[i]) / sizeof(*msg_static[i])) );
     }
 
+    delay(10000); // Stay connected for 10 sec
+
     // Disconnect
-    doConnect = false;
-    connected = false;
+    doConnect = true;
     doScan = true;
-    
-    //bleInit();
-    
-  }else if(doScan){
-    BLEDevice::getScan()->start(0);  // this is just eample to start scan after disconnect, most likely there is better way to do it in arduino
+    pClient->disconnect();
+
+    // Refresh the screen for next device
+    delay(1000);
+    M5.Lcd.fillScreen(BLACK); 
+    M5.Lcd.setCursor(0, 0);
   }
-  delay(1000); 
+
+  // Start Scan again
+  if(doScan){
+    M5.Lcd.printf(">>> Scaning...\n");
+    BLEDevice::getScan()->start(0);  // this is just eample to start scan after disconnect, most likely there is better way to do it in arduino       
+    doScan = false;
+  } 
+  M5.update();
 } 
