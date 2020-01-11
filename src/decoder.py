@@ -19,6 +19,7 @@
 # 20191222    jilles      1.01       Converted to Python3 added parameter input and fault handling 
 # 20200103    jilles      1.02       Messages are 128 nibbles = 64 bytes, added argparse
 # 20200111    jilles      1.03       Last line was not interpreted, fixed
+# 20200111    jilles      1.04       Added reference to encoder
 #
 ####################################################################################################
 
@@ -55,13 +56,14 @@
 #    X X       X X   X   X X   X   X X       X       
 #      X X X     X X       X X     X X X X   X       
 #
+# Note: there is also an encoder available to create uartstrings
 
 import sys
 import argparse
 
 line_length = 128
 
-parser = argparse.ArgumentParser(description="decoder.py - v 1.03 by Jurre & Jilles Groenendijk")
+parser = argparse.ArgumentParser(description="decoder.py - v 1.04 by Jurre & Jilles Groenendijk")
 parser.add_argument("-v", "--verbose", action="store_true")
 parser.add_argument("-d", "--debug", action="store_true")
 parser.add_argument("-q", "--quiet", action="store_true")
