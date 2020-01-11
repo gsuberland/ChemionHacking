@@ -18,6 +18,7 @@
 # 20191220    jurre       1.00       Initial release (Python2)
 # 20191222    jilles      1.01       Converted to Python3 added parameter input and fault handling 
 # 20200103    jilles      1.02       Messages are 128 nibbles = 64 bytes, added argparse
+# 20200111    jilles      1.03       Last line was not interpreted, fixed
 #
 ####################################################################################################
 
@@ -60,7 +61,7 @@ import argparse
 
 line_length = 128
 
-parser = argparse.ArgumentParser(description="decoder.py - v 1.02 by Jurre & Jilles Groenendijk")
+parser = argparse.ArgumentParser(description="decoder.py - v 1.03 by Jurre & Jilles Groenendijk")
 parser.add_argument("-v", "--verbose", action="store_true")
 parser.add_argument("-d", "--debug", action="store_true")
 parser.add_argument("-q", "--quiet", action="store_true")
@@ -68,7 +69,7 @@ parser.add_argument("uartstring", type=str,help="the uartstring (128 character)"
 args = parser.parse_args()
 
 # Get string from stdin
-data=args.uartstring;
+data=args.uartstring
 if( data=="-"):
   data = input()
 
@@ -82,20 +83,19 @@ header = data[:14]     # fa030039010006
 body   = data[14:122]  # 0000000000003f0f03c3c0c0f03ccf33c0c0f03ccf33c0c0f03ccf33c0c0f03ccf33c000f03ccf33c0c03f0f03c3fcc0000000000000
 crc    = data[122:124] # cb
 footer = data[124:]    # 55a9
-
 if(args.debug):
-  print("DEBUG");
-  print("Header: ", header," (",len(header),")");
-  print("Body  : ", body," (",len(body),")");
-  print("CRC   : ", crc," (",len(crc),")");
-  print("Footer: ", footer," (",len(footer),")");
-  print();
+  print("DEBUG")
+  print("Header: ", header," (",len(header),")")
+  print("Body  : ", body," (",len(body),")")
+  print("CRC   : ", crc," (",len(crc),")")
+  print("Footer: ", footer," (",len(footer),")")
+  print()
 
 all_bits="".join(["0"*(4-len(str(bin(int(x,16)))[2:]))+str(bin(int(x,16)))[2:] for x in body])
 
 all_pixels = [all_bits[x:x+2] for x in range(0, len(all_bits),2)]
   
-for x in range(0, 8):
+for x in range(0, 9):
   if( args.verbose ): print( " ", x, "| " , end="" )
   for y in range(0, 24):
     pixel=all_pixels[x*24+y]
