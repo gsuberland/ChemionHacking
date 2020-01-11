@@ -15,6 +15,7 @@
 #
 # Date        Author      Version    Revision (Date in YYYYMMDD format) 
 # 20200111    jilles      1.00       Initial release
+# 20200111    jilles      1.01       New version to include Arduino structs
 #
 ####################################################################################################
 
@@ -57,9 +58,8 @@ import os.path
 from os import path
 import argparse
 
-parser = argparse.ArgumentParser(description="encoder.py - v 1.00 by  Jilles Groenendijk")
+parser = argparse.ArgumentParser(description="encoder.py - v 1.01 by  Jilles Groenendijk")
 parser.add_argument("-d", "--debug", action="store_true")
-parser.add_argument("-q", "--quiet", action="store_true")
 parser.add_argument("filename", type=str,help="the filename containing the design to encode to an uartstring")
 args = parser.parse_args()
 
@@ -125,5 +125,29 @@ if(args.debug):
   print("uartstring:")
 
 print(uartstring)
+print("")
 
-## EOF ##
+print("    uint8_t msg_static[4][20] = {{",end="")
+for f in range(63):
+  print("0x"+uartstring[(f*2):(f*2)+2]+",",end="")
+
+  if(((f+1)%20)==0):
+    print("},\n                                 {",end="")
+f+=1
+print("0x"+uartstring[(f*2):(f*2)+2]+"}};\n")
+
+print("    uint8_t msg_save[8][20] = {{0xfa,0x01,0x00,0x03,0x01,0x00,0x05,0x04,0x55,0xa9},")
+print("                               {0xfa,0x01,0x00,0x04,0x01,0x00,0x14,0x05,0x10,0x55,0xa9},")
+print("                               {0xfa,0x01,0x00,0x06,0x01,0x00,0x0b,0x05,0x00,0x01,0x0e,0x55,0xa9},")
+
+uartstring="fa01003b01000d010a"+uartstring[14:129]
+print("                               {",end="")
+
+for f in range(65):
+  print("0x"+uartstring[(f*2):(f*2)+2]+",",end="")
+
+  if(((f+1)%20)==0):
+    print("},\n                               {",end="")
+f+=1
+print("0x"+uartstring[(f*2):(f*2)+2]+"},")
+print("                               {0xfa,0x01,0x00,0x03,0x01,0x00,0x0c,0x0d,0x55,0xa9}};")
