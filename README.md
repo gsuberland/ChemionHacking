@@ -17,8 +17,9 @@ Visit [the project wiki](https://github.com/notpike/ChemionHacking/wiki) for inf
 
 
 ### Contributors
-* Gsuberland
+* gsuberland
 * Jilles
 * Jurrejelle
 * Tnayuki
 * NotPike
+* mcaravati
